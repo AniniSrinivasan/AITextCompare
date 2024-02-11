@@ -1,6 +1,6 @@
 import os
 from PyQt5.QtWidgets import QApplication
-from renderer import UIRender
+from ui_renderer import UIRender
 
 if __name__ == "__main__":
     app = QApplication([])
