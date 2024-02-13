@@ -1,7 +1,9 @@
 import os
 
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QHBoxLayout, QLabel
+
+from src.diff_generator import DiffGenerator
 
 
 class UIRender(QWidget):
@@ -10,9 +12,18 @@ class UIRender(QWidget):
 
         layout = QVBoxLayout()
 
+        # Add labels above the text areas
+        original_label = QLabel("Original Version")
+        latest_label = QLabel("Latest Version")
+
         # Add two text areas for left and right content
         self.left_text_area = QTextEdit(self)
         self.right_text_area = QTextEdit(self)
+
+        text_areas_layout = QHBoxLayout()
+        text_areas_layout.addWidget(original_label)
+        text_areas_layout.addWidget(latest_label)
+        layout.addLayout(text_areas_layout)
 
         text_areas_layout = QHBoxLayout()
         text_areas_layout.addWidget(self.left_text_area)
@@ -41,7 +52,9 @@ class UIRender(QWidget):
         right_content = self.right_text_area.toPlainText()
 
         # Generate HTML diff
-        diff_html = self.generate_html_diff(left_content, right_content)
+        diff_html = DiffGenerator.generate_html_diff(left_content, right_content)
+
+
 
         # Write the HTML diff to a file in the same location
         output_file_path = os.path.join(os.path.dirname(__file__), "diff_output.html")
