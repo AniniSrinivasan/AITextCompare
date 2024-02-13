@@ -1,4 +1,5 @@
 import difflib
+import os
 
 
 class DiffGenerator:
@@ -25,7 +26,11 @@ class DiffGenerator:
             else:
                 result.append(item)
 
-        return DiffGenerator.replace_diff_body("/Users/aninisrinivasan/PycharmProjects/AITextCompareProject/template/diff_output_template.html", ' '.join(result))
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        # Get the parent directory of the current directory
+        parent_directory = os.path.dirname(current_directory)
+        html_template_path = os.path.join(parent_directory, "template", "diff_output_template.html")
+        return DiffGenerator.replace_diff_body(html_template_path, ' '.join(result))
 
     @staticmethod
     def replace_diff_body(template_file, body):
