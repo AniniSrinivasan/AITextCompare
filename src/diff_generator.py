@@ -28,18 +28,11 @@ class DiffGenerator:
                 new_sentence_string = DiffGenerator.join_array_get_string(' ', current_new_sentence)
 
                 if (old_sentence_string.find(".") != -1 and new_sentence_string.find(".") != -1) or index == len(diff) - 1:
-                    # print("--")
-                    # print(old_sentence_string)
-                    # print(new_sentence_string)
-                    # print("--")
+
                     current_old_sentence = []
                     current_new_sentence = []
 
-                    if old_sentence_string.lower() == new_sentence_string.lower():
-                        sentiment = SentimentAnalyser.get_sentiment(old_sentence_string)
-
-
-
+                    SentimentAnalyser.add_sentiment_to_result(new_sentence_string, old_sentence_string, result)
 
         current_directory = os.path.dirname(os.path.abspath(__file__))
         # Get the parent directory of the current directory
