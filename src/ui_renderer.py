@@ -85,11 +85,11 @@ class UIRender(QWidget):
         diff_html = DiffGenerator.generate_html_diff(left_content, right_content)
 
 
-
-        # Write the HTML diff to a file in the same location
-        output_file_path = os.path.join(os.path.dirname(__file__), "diff_output.html")
-        with open(output_file_path, 'w') as f:
-            f.write(diff_html)
+        #
+        # # Write the HTML diff to a file in the same location
+        # output_file_path = os.path.join(os.path.dirname(__file__), "diff_output.html")
+        # with open(output_file_path, 'w') as f:
+        #     f.write(diff_html)
 
         # Render the HTML diff
         self.web_view.setHtml(diff_html)
