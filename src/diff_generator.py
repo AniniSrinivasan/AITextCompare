@@ -3,16 +3,12 @@ import os
 
 
 class DiffGenerator:
-    @staticmethod
-    def generate_html_diff_1(old_text, new_text):
-        diffHtml = difflib.HtmlDiff()
-        return diffHtml.make_file(old_text.splitlines(), new_text.splitlines())
 
     @staticmethod
     def generate_html_diff(new_words, old_words):
         # Compute the differences
         differ = difflib.Differ()
-        diff = list(differ.compare(old_words.split(), new_words.split()))
+        diff = list(differ.compare(new_words.split(), old_words.split()))
 
         result = []
         for index, item in enumerate(diff):
@@ -41,9 +37,6 @@ class DiffGenerator:
         # Replace the placeholder with the body string
         updated_content = template_content.replace("$$$DIFF_BODY$$$", body)
         return updated_content
-        # # Write the modified content back to the file
-        # with open(template_file, 'w') as file:
-        #     file.write(updated_content)
 
 
 
