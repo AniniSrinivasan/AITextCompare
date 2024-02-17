@@ -4,15 +4,16 @@ import os
 from src.ai_analyser.paraphrase_analyser import ParaphraseAnalyser
 from src.ai_analyser.sentiment_analyser import SentimentAnalyser
 from src.ai_analyser.similarity_analyser import SimilarityAnalyser
+from src.ai_analyser.summary_generator import SummaryGenerator
 
 
 class DiffGenerator:
 
     @staticmethod
-    def generate_html_diff(new_words, old_words):
+    def generate_html_diff(new_content, old_content):
         # Compute the differences
         differ = difflib.Differ()
-        diff = list(differ.compare(new_words.split(), old_words.split()))
+        diff = list(differ.compare(new_content.split(), old_content.split()))
 
         current_old_sentence = []
         current_new_sentence = []
@@ -34,19 +35,15 @@ class DiffGenerator:
                     current_old_sentence = []
                     current_new_sentence = []
 
-                    is_same_sentiment = SentimentAnalyser.add_sentiment_to_result(new_sentence_string, old_sentence_string, result)
-                    is_similar = SimilarityAnalyser.add_similarity_to_result(new_sentence_string, old_sentence_string, result)
-                    ParaphraseAnalyser.add_paraphrase_to_result(new_sentence_string, old_sentence_string, result, is_same_sentiment, is_similar)
+                    # is_same_sentiment = SentimentAnalyser.add_sentiment_to_result(new_sentence_string, old_sentence_string, result)
+                    # is_similar = SimilarityAnalyser.add_similarity_to_result(new_sentence_string, old_sentence_string, result)
+                    # ParaphraseAnalyser.add_paraphrase_to_result(new_sentence_string, old_sentence_string, result, is_same_sentiment, is_similar)
 
-                    print(f"is_same_sentiment : {is_same_sentiment}")
-                    print(f"is_similar : {is_similar}")
+        diff_string = DiffGenerator.join_array_get_string(' ', result)
 
-        current_directory = os.path.dirname(os.path.abspath(__file__))
-        # Get the parent directory of the current directory
-        parent_directory = os.path.dirname(current_directory)
-        html_template_path = os.path.join(parent_directory, "template", "diff_output_template.html")
+        summary_html = SummaryGenerator.get_summary_html(new_content)
 
-        return DiffGenerator.replace_diff_body(html_template_path, ' '.join(result))
+        return DiffGenerator.replace_diff_body(diff_string, summary_html)
 
     @staticmethod
     def trace_back_old_new_sentence(current_new_sentence, current_old_sentence, item, itemValue):
@@ -62,11 +59,6 @@ class DiffGenerator:
         else:
             current_old_sentence.append(item)
             current_new_sentence.append(item)
-
-    #
-    # @staticmethod
-    # def has_full_stop(self, new_sentence_string, old_sentence_string):
-    #     return old_sentence_string.find(".") != -1 and new_sentence_string.find(".")
 
     @staticmethod
     def add_diff_highliter(item, itemValue, result):
@@ -85,13 +77,20 @@ class DiffGenerator:
         return delimiter.join(array)
 
     @staticmethod
-    def replace_diff_body(template_file, body):
+    def replace_diff_body(diff_html, summary_html):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Get the parent directory of the current directory
+        parent_directory = os.path.dirname(current_directory)
+        template_file = os.path.join(parent_directory, "template", "diff_output_template.html")
+
         # Read the content of the template file
         with open(template_file, 'r') as file:
             template_content = file.read()
 
         # Replace the placeholder with the body string
-        updated_content = template_content.replace("$$$DIFF_BODY$$$", body)
+        updated_content = template_content.replace("$$$DIFF_BODY$$$", diff_html)
+        updated_content = updated_content.replace("$$$SUMMARY$$$", summary_html)
         return updated_content
 
 
