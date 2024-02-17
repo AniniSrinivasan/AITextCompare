@@ -36,6 +36,9 @@ class SentimentAnalyser:
                     + """<span class="arrow">→</span>"""
                     + SentimentAnalyser.get_emoji_alone(new_sentiment)
                     + "]")
+                return False
+
+        return True
 
     @staticmethod
     def get_emoji(sentiment):

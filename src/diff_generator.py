@@ -1,6 +1,7 @@
 import difflib
 import os
 
+from src.ai_analyser.paraphrase_analyser import ParaphraseAnalyser
 from src.ai_analyser.sentiment_analyser import SentimentAnalyser
 from src.ai_analyser.similarity_analyser import SimilarityAnalyser
 
@@ -33,8 +34,12 @@ class DiffGenerator:
                     current_old_sentence = []
                     current_new_sentence = []
 
-                    SentimentAnalyser.add_sentiment_to_result(new_sentence_string, old_sentence_string, result)
-                    SimilarityAnalyser.add_similarity_to_result(new_sentence_string, old_sentence_string, result)
+                    is_same_sentiment = SentimentAnalyser.add_sentiment_to_result(new_sentence_string, old_sentence_string, result)
+                    is_similar = SimilarityAnalyser.add_similarity_to_result(new_sentence_string, old_sentence_string, result)
+                    ParaphraseAnalyser.add_paraphrase_to_result(new_sentence_string, old_sentence_string, result, is_same_sentiment, is_similar)
+
+                    print(f"is_same_sentiment : {is_same_sentiment}")
+                    print(f"is_similar : {is_similar}")
 
         current_directory = os.path.dirname(os.path.abspath(__file__))
         # Get the parent directory of the current directory

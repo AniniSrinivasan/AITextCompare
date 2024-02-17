@@ -20,6 +20,10 @@ class SimilarityAnalyser:
             cosine_similarity = SimilarityAnalyser.get_similarity(embeddings1, embeddings2)
 
             result.append(SimilarityAnalyser.get_emoji(cosine_similarity.item()))
+            if cosine_similarity.item() < 0.7:
+                return False
+
+        return True
 
     @staticmethod
     def get_emoji(similarity_index):
