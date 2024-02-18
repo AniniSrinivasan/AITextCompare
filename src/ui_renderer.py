@@ -1,7 +1,8 @@
 import os
-
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QHBoxLayout, QLabel, QCheckBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QHBoxLayout, QLabel, QCheckBox, QFileDialog
 
 from src.diff_generator import DiffGenerator
 
@@ -12,7 +13,7 @@ class UIRender(QWidget):
 
         layout = QVBoxLayout()
 
-        # Add labels above the text areas
+        # Add labels above the text areas with upload buttons
         label_layout = self.addLabel()
         layout.addLayout(label_layout)
 
@@ -35,11 +36,43 @@ class UIRender(QWidget):
 
     def addLabel(self):
         original_label = QLabel("Original Version")
+        original_upload_button = QPushButton()
+        original_upload_button.setIcon(QIcon('../static/upload.png'))
+        original_upload_button.setIconSize(QSize(16, 16))  # Fix the icon size here
+        original_label_layout = QHBoxLayout()
+        original_label_layout.addWidget(original_label)
+        original_label_layout.addWidget(original_upload_button)
+        original_upload_button.clicked.connect(self.upload_left_file)
+
         latest_label = QLabel("Latest Version")
-        label_layout = QHBoxLayout()
-        label_layout.addWidget(original_label)
-        label_layout.addWidget(latest_label)
+        latest_upload_button = QPushButton()
+        latest_upload_button.setIcon(QIcon('../static/upload.png'))
+        latest_upload_button.setIconSize(QSize(16, 16))  # Fix the icon size here
+        latest_label_layout = QHBoxLayout()
+        latest_label_layout.addWidget(latest_label)
+        latest_label_layout.addWidget(latest_upload_button)
+        latest_upload_button.clicked.connect(self.upload_right_file)
+
+        label_layout = QHBoxLayout()  # Use QHBoxLayout for placing widgets side by side
+        label_layout.addLayout(original_label_layout)
+        label_layout.addStretch(1)  # Add a stretchable space
+        label_layout.addWidget(QLabel("   "))  # Add some additional space between the label sets
+        label_layout.addLayout(latest_label_layout)
         return label_layout
+
+    def upload_left_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Upload Original File", "", "Text Files (*.txt)")
+        if file_path:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                self.left_text_area.setPlainText(content)
+
+    def upload_right_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Upload Latest File", "", "Text Files (*.txt)")
+        if file_path:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                self.right_text_area.setPlainText(content)
 
     def addCompareButton(self):
         compare_button = QPushButton("Compare")
@@ -84,13 +117,6 @@ class UIRender(QWidget):
         # Generate HTML diff
         diff_html = DiffGenerator.generate_html_diff(left_content, right_content)
 
-
-        #
-        # # Write the HTML diff to a file in the same location
-        # output_file_path = os.path.join(os.path.dirname(__file__), "diff_output.html")
-        # with open(output_file_path, 'w') as f:
-        #     f.write(diff_html)
-
         # Render the HTML diff
         self.web_view.setHtml(diff_html)
 
@@ -115,3 +141,19 @@ class UIRender(QWidget):
             html = f"<html><body>{html}</body></html>"
 
         self.web_view.setHtml(html)
+
+    def upload_left_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Upload Original File", "", "Text Files (*.txt)")
+        if file_path:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                self.left_text_area.setPlainText(content)
+
+    def upload_right_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Upload Latest File", "", "Text Files (*.txt)")
+        if file_path:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                self.right_text_area.setPlainText(content)
+
+
