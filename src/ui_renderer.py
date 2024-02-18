@@ -1,15 +1,17 @@
 import os
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QHBoxLayout, QLabel, QCheckBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QHBoxLayout, QLabel, QCheckBox, QFileDialog, QFrame, QListWidget, QListWidgetItem
 
 from src.diff_generator import DiffGenerator
-
 
 class UIRender(QWidget):
     def __init__(self, html_file, css_file=None):
         super(UIRender, self).__init__()
+
+        # Initialize history list
+        self.history = []
 
         layout = QVBoxLayout()
 
@@ -28,11 +30,60 @@ class UIRender(QWidget):
         checkboxes_layout = self.addAICheckBoxes()
         layout.addLayout(checkboxes_layout)
 
+        # Add history list
+        self.history_list = QListWidget()
+        self.history_list.itemDoubleClicked.connect(self.load_left_content_from_history)
+        layout.addWidget(self.history_list)
+
         self.web_view = QWebEngineView()
         layout.addWidget(self.web_view)
 
         self.setLayout(layout)
         self.render_from_files(html_file, css_file)
+
+    def load_left_content_from_history(self, item):
+        # Get selected history item text (e.g., compare_1)
+        history_item = item.text()
+
+        # Extract the index from the history item text (e.g., 1)
+        compare_index = int(history_item.split('_')[1])
+
+        # Load left and right content from the corresponding history files
+        left_file_path = os.path.join('history', f'compare_{compare_index}_left.txt')
+        right_file_path = os.path.join('history', f'compare_{compare_index}_right.txt')
+
+        if os.path.exists(left_file_path):
+            with open(left_file_path, 'r') as left_file:
+                left_content = left_file.read()
+                self.left_text_area.setPlainText(left_content)
+
+        if os.path.exists(right_file_path):
+            with open(right_file_path, 'r') as right_file:
+                right_content = right_file.read()
+                self.right_text_area.setPlainText(right_content)
+
+    def addHistoryPanel(self):
+        panel = QFrame()
+        panel_layout = QVBoxLayout()
+        panel_layout.setAlignment(Qt.AlignTop)
+
+        # Add a button to toggle the visibility of the history panel
+        toggle_button = QPushButton("History")
+        toggle_button.clicked.connect(self.toggle_history_panel)
+        panel_layout.addWidget(toggle_button)
+
+        # Add a list widget to display the compare history
+        self.history_list = QListWidget()
+        panel_layout.addWidget(self.history_list)
+
+        panel.setLayout(panel_layout)
+        return panel
+
+    def toggle_history_panel(self):
+        if self.history_panel.isHidden():
+            self.history_panel.show()
+        else:
+            self.history_panel.hide()
 
     def addLabel(self):
         original_label = QLabel("Original Version")
@@ -114,11 +165,36 @@ class UIRender(QWidget):
         left_content = self.left_text_area.toPlainText()
         right_content = self.right_text_area.toPlainText()
 
+        # Save compared files to local folder
+        if not os.path.exists('history'):
+            os.makedirs('history')
+
+        compare_index = len(self.history) + 1
+        compare_name = f'compare_{compare_index}'
+        compare_left_path = os.path.join('history', f'{compare_name}_left.txt')
+        compare_right_path = os.path.join('history', f'{compare_name}_right.txt')
+
+        with open(compare_left_path, 'w') as left_file:
+            left_file.write(left_content)
+
+        with open(compare_right_path, 'w') as right_file:
+            right_file.write(right_content)
+
+        # Update history list
+        self.history.append(compare_name)
+        self.update_history_list()
+
         # Generate HTML diff
         diff_html = DiffGenerator.generate_html_diff(left_content, right_content)
 
         # Render the HTML diff
         self.web_view.setHtml(diff_html)
+
+    def update_history_list(self):
+        self.history_list.clear()
+        for item in self.history:
+            list_item = QListWidgetItem(item)
+            self.history_list.addItem(list_item)
 
     def render_from_files(self, html_file, css_file=None):
         html_path = os.path.abspath(html_file)
@@ -141,19 +217,3 @@ class UIRender(QWidget):
             html = f"<html><body>{html}</body></html>"
 
         self.web_view.setHtml(html)
-
-    def upload_left_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Upload Original File", "", "Text Files (*.txt)")
-        if file_path:
-            with open(file_path, 'r') as file:
-                content = file.read()
-                self.left_text_area.setPlainText(content)
-
-    def upload_right_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Upload Latest File", "", "Text Files (*.txt)")
-        if file_path:
-            with open(file_path, 'r') as file:
-                content = file.read()
-                self.right_text_area.setPlainText(content)
-
-
