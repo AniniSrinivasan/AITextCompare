@@ -30,11 +30,10 @@ class SummaryGenerator:
     @staticmethod
     def get_html(summary_string):
         summary_template = f"""
-                </table>
+                
                 <h3>Summary </h3>
                 <tbody>{summary_string}</tbody>
-                    </body>
-            </body>
+                   
             """
 
         return summary_template

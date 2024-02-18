@@ -1,6 +1,7 @@
 import difflib
 import os
 
+from src.ai_analyser.grammar_score_generator import GrammarScoreGenerator
 from src.ai_analyser.paraphrase_analyser import ParaphraseAnalyser
 from src.ai_analyser.sentiment_analyser import SentimentAnalyser
 from src.ai_analyser.similarity_analyser import SimilarityAnalyser
@@ -42,8 +43,9 @@ class DiffGenerator:
         diff_string = DiffGenerator.join_array_get_string(' ', result)
 
         summary_html = SummaryGenerator.get_summary_html(new_content)
+        grammar_html = GrammarScoreGenerator.get_grammar_score_html(new_content)
 
-        return DiffGenerator.replace_diff_body(diff_string, summary_html)
+        return DiffGenerator.replace_diff_body(diff_string, summary_html, grammar_html)
 
     @staticmethod
     def trace_back_old_new_sentence(current_new_sentence, current_old_sentence, item, itemValue):
@@ -77,7 +79,7 @@ class DiffGenerator:
         return delimiter.join(array)
 
     @staticmethod
-    def replace_diff_body(diff_html, summary_html):
+    def replace_diff_body(diff_html, summary_html, grammar_html):
         current_directory = os.path.dirname(os.path.abspath(__file__))
 
         # Get the parent directory of the current directory
@@ -91,6 +93,8 @@ class DiffGenerator:
         # Replace the placeholder with the body string
         updated_content = template_content.replace("$$$DIFF_BODY$$$", diff_html)
         updated_content = updated_content.replace("$$$SUMMARY$$$", summary_html)
+        updated_content = updated_content.replace("$$$GRAMMAR_SCORE$$$", grammar_html)
+
         return updated_content
 
 
