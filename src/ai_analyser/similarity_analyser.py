@@ -11,7 +11,7 @@ class SimilarityAnalyser:
         return cosine_similarity
 
     @staticmethod
-    def add_similarity_to_result(new_sentence_string, old_sentence_string, result):
+    def add_similarity_to_result(new_sentence_string, old_sentence_string, result, is_similarity_checked):
         if old_sentence_string.lower() != new_sentence_string.lower():
 
             embeddings1 = model.encode(new_sentence_string, convert_to_tensor=True)
@@ -19,7 +19,8 @@ class SimilarityAnalyser:
 
             cosine_similarity = SimilarityAnalyser.get_similarity(embeddings1, embeddings2)
 
-            result.append(SimilarityAnalyser.get_emoji(cosine_similarity.item()))
+            if is_similarity_checked:
+                result.append(SimilarityAnalyser.get_emoji(cosine_similarity.item()))
             if cosine_similarity.item() < 0.7:
                 return False
 

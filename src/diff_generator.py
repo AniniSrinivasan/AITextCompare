@@ -11,10 +11,16 @@ from src.ai_analyser.summary_generator import SummaryGenerator
 class DiffGenerator:
 
     @staticmethod
-    def generate_html_diff(new_content, old_content):
+    def generate_html_diff(old_content, new_content,
+                           is_sentiment_checked,
+                           is_similarity_checked,
+                           is_paraphrase_checked,
+                           is_summary_checked,
+                           is_grammar_checked
+                           ):
         # Compute the differences
         differ = difflib.Differ()
-        diff = list(differ.compare(new_content.split(), old_content.split()))
+        diff = list(differ.compare(old_content.split(), new_content.split()))
 
         current_old_sentence = []
         current_new_sentence = []
@@ -36,14 +42,24 @@ class DiffGenerator:
                     current_old_sentence = []
                     current_new_sentence = []
 
-                    # is_same_sentiment = SentimentAnalyser.add_sentiment_to_result(new_sentence_string, old_sentence_string, result)
-                    # is_similar = SimilarityAnalyser.add_similarity_to_result(new_sentence_string, old_sentence_string, result)
-                    # ParaphraseAnalyser.add_paraphrase_to_result(new_sentence_string, old_sentence_string, result, is_same_sentiment, is_similar)
+                    is_same_sentiment = SentimentAnalyser.add_sentiment_to_result(
+                                        new_sentence_string, old_sentence_string, result, is_sentiment_checked)
+                    is_similar = SimilarityAnalyser.add_similarity_to_result(
+                        new_sentence_string, old_sentence_string, result, is_similarity_checked)
+
+                    if is_paraphrase_checked:
+                        ParaphraseAnalyser.add_paraphrase_to_result(new_sentence_string, old_sentence_string, result,
+                                                                is_same_sentiment, is_similar)
 
         diff_string = DiffGenerator.join_array_get_string(' ', result)
 
-        summary_html = SummaryGenerator.get_summary_html(new_content)
-        grammar_html = GrammarScoreGenerator.get_grammar_score_html(new_content)
+        summary_html = ""
+        if is_summary_checked:
+            summary_html = SummaryGenerator.get_summary_html(new_content)
+
+        grammar_html = ""
+        if is_grammar_checked:
+            grammar_html = GrammarScoreGenerator.get_grammar_score_html(new_content)
 
         return DiffGenerator.replace_diff_body(diff_string, summary_html, grammar_html)
 

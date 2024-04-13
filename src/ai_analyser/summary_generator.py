@@ -25,7 +25,12 @@ class SummaryGenerator:
             summary_string = SummaryGenerator.summarize_text(new_content)
             return SummaryGenerator.get_html(summary_string)
         else:
-            return ""
+            return f"""
+                
+                <h3>Summary </h3>
+                <tbody>There must be at least 100 words for summary</tbody>
+                   
+            """
 
     @staticmethod
     def get_html(summary_string):

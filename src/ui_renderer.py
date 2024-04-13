@@ -10,7 +10,7 @@ class UIRender(QWidget):
     def __init__(self, html_file, css_file=None):
         super(UIRender, self).__init__()
 
-        # Initialize history list
+        # Initialise history list
         self.history = []
 
         layout = QVBoxLayout()
@@ -152,6 +152,14 @@ class UIRender(QWidget):
         self.paraphrase_checkbox = QCheckBox("Paraphrase", self)
         self.summary_checkbox = QCheckBox("Summary", self)
         self.grammar_score_checkbox = QCheckBox("Grammar Score", self)
+
+        # Disable the checkboxes
+        self.sentiment_checkbox.setEnabled(False)
+        self.similarity_checkbox.setEnabled(False)
+        self.paraphrase_checkbox.setEnabled(False)
+        self.summary_checkbox.setEnabled(False)
+        self.grammar_score_checkbox.setEnabled(False)
+
         checkboxes_layout = QHBoxLayout()
         checkboxes_layout.addWidget(self.sentiment_checkbox)
         checkboxes_layout.addWidget(self.similarity_checkbox)
@@ -161,6 +169,13 @@ class UIRender(QWidget):
         return checkboxes_layout
 
     def on_compare_clicked(self):
+
+        self.sentiment_checkbox.setEnabled(True)
+        self.similarity_checkbox.setEnabled(True)
+        self.paraphrase_checkbox.setEnabled(True)
+        self.summary_checkbox.setEnabled(True)
+        self.grammar_score_checkbox.setEnabled(True)
+
         # Get the content from the text areas
         left_content = self.left_text_area.toPlainText()
         right_content = self.right_text_area.toPlainText()
@@ -185,7 +200,12 @@ class UIRender(QWidget):
         self.update_history_list()
 
         # Generate HTML diff
-        diff_html = DiffGenerator.generate_html_diff(left_content, right_content)
+        diff_html = DiffGenerator.generate_html_diff(left_content, right_content,
+                                                     self.sentiment_checkbox.isChecked(),
+                                                     self.similarity_checkbox.isChecked(),
+                                                     self.paraphrase_checkbox.isChecked(),
+                                                     self.summary_checkbox.isChecked(),
+                                                     self.grammar_score_checkbox.isChecked())
 
         # Render the HTML diff
         self.web_view.setHtml(diff_html)

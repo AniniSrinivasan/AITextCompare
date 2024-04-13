@@ -17,25 +17,28 @@ class SentimentAnalyser:
         return sentiment
 
     @staticmethod
-    def add_sentiment_to_result(new_sentence_string, old_sentence_string, result):
+    def add_sentiment_to_result(new_sentence_string, old_sentence_string, result, is_sentiment_checked):
         if old_sentence_string.lower() == new_sentence_string.lower():
             sentiment = SentimentAnalyser.get_sentiment(old_sentence_string)
 
-            result.append(SentimentAnalyser.get_emoji(sentiment))
+            if is_sentiment_checked:
+                result.append(SentimentAnalyser.get_emoji(sentiment))
 
         else:
             old_sentiment = SentimentAnalyser.get_sentiment(old_sentence_string)
             new_sentiment = SentimentAnalyser.get_sentiment(new_sentence_string)
 
             if old_sentiment == new_sentiment:
-                result.append(SentimentAnalyser.get_emoji(old_sentiment))
+                if is_sentiment_checked:
+                    result.append(SentimentAnalyser.get_emoji(old_sentiment))
             else:
-                result.append(
-                    "[Sentiment:"
-                    + SentimentAnalyser.get_emoji_alone(old_sentiment)
-                    + """<span class="arrow">→</span>"""
-                    + SentimentAnalyser.get_emoji_alone(new_sentiment)
-                    + "]")
+                if is_sentiment_checked:
+                    result.append(
+                        "[Sentiment:"
+                        + SentimentAnalyser.get_emoji_alone(old_sentiment)
+                        + """<span class="arrow">→</span>"""
+                        + SentimentAnalyser.get_emoji_alone(new_sentiment)
+                        + "]")
                 return False
 
         return True
