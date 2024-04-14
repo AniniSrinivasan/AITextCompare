@@ -28,7 +28,7 @@ class SummaryGenerator:
             return f"""
                 
                 <h3>Summary </h3>
-                <tbody>There must be at least 100 words for summary</tbody>
+                <tbody>Please provide a minimum of 100 words to generate a summary.</tbody>
                    
             """
 
